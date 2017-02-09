@@ -59,23 +59,12 @@ func (t *Ticker) Start() error {
 		go t.processCurr(f)
 	}
 
-	// Handle and store responses from bitcoin services
+	// Handle and store responses from feed services
 	go func() {
 		for {
 			select {
 			case r := <-t.btcRes:
 				t.totalBtcResp = append(t.totalBtcResp, r)
-			case <-t.stop:
-				return
-
-			}
-		}
-	}()
-
-	// Handle and store responses from bitcoin services
-	go func() {
-		for {
-			select {
 			case r := <-t.currRes:
 				t.totalCurrResp = append(t.totalCurrResp, r)
 			case <-t.stop:
@@ -98,10 +87,8 @@ func (t *Ticker) Print() {
 	// Wait while all processes will be done
 	t.wg.Wait()
 
-	// Try to stop response handlers
-	for i := 0; i < 2; i++ {
-		t.stop <- struct{}{}
-	}
+	// Try to stop response handler
+	t.stop <- struct{}{}
 
 	// Close all channels, cause we've done our JOB
 	close(t.start)
