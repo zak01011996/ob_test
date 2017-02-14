@@ -112,9 +112,17 @@ func (t *Ticker) Print() {
 	eurUsd := curr.Rate
 	btcEur := btc.Rate / curr.Rate
 
+	// Clear previous line
+	cls := "\r"
+	for i := 0; i < 100; i++ {
+		cls += " "
+	}
+
+	fmt.Print(cls)
+
 	// Print result
 	fmt.Printf(
-		"BTC/USD: %.2f EUR/USD: %.2f BTC/EUR: %.2f Active sources: BTC/USD (%d of %d, used: %s) EUR/USD (%d of %d, used: %s)\n",
+		"\rBTC/USD: %.2f EUR/USD: %.2f BTC/EUR: %.2f Active sources: BTC/USD (%d of %d, used: %s) EUR/USD (%d of %d, used: %s)",
 		btsUsd,
 		eurUsd,
 		btcEur,
@@ -125,6 +133,9 @@ func (t *Ticker) Print() {
 		len(t.CurrFeeds),
 		curr.Name,
 	)
+
+	// Clear state
+	t.clearState()
 }
 
 func (t *Ticker) processBtc(feed btcfeed.BtcFeed) {
@@ -155,4 +166,9 @@ func (t *Ticker) processCurr(feed currfeed.CurrFeed) {
 	}
 
 	t.wg.Done()
+}
+
+func (t *Ticker) clearState() {
+	t.totalBtcResp = nil
+	t.totalCurrResp = nil
 }
